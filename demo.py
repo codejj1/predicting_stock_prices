@@ -3,22 +3,21 @@ import numpy as np
 from sklearn.svm import SVR
 import matplotlib.pyplot as plt
 
+# if pyplot has issues
+#plt.switch_backend('newbackend')  
 
-plt.switch_backend('newbackend')  
-
-
-
-dates = []
-prices = []
-
-def get_data(filename):
+def get_data(filename,dates,prices):
+	dates = []
+	prices = []
 	with open(filename, 'r') as csvfile:
 		csvFileReader = csv.reader(csvfile)
 		next(csvFileReader)	# skipping column names
 		for row in csvFileReader:
-			dates.append(int(row[0].split('-')[0]))
-			prices.append(float(row[1]))
-	return
+			dates.append(int(row[0].split('-')[2]))
+			prices.append(float(row[1])) # open value
+	dates = dates[8:23]
+	prices = prices[8:23]
+	return dates, prices
 
 def predict_price(dates, prices, x):
 	dates = np.reshape(dates,(len(dates), 1)) # converting to matrix of n X 1
@@ -40,10 +39,14 @@ def predict_price(dates, prices, x):
 	plt.legend()
 	plt.show()
 
-	return svr_rbf.predict(x)[0], svr_lin.predict(x)[0], svr_poly.predict(x)[0]
+	return svr_lin.predict(x), svr_poly.predict(x), svr_rbf.predict(x)
 
-get_data('aapl.csv') # calling get_data method by passing the csv file to it
-#print "Dates- ", dates
-#print "Prices- ", prices
+dates = []
+prices = []
+dates, prices = get_data('AAPL.csv',dates,prices) # calling get_data method by passing the csv file to it
+print "Dates- ", dates
+print "Prices- ", prices
 
-predicted_price = predict_price(dates, prices, 29)  
+predicted_price = predict_price(dates, prices, [[29],[4]])
+print 'predicted prices are ',predict_price
+
